@@ -10,8 +10,8 @@
   "scripts": {
     "install:all": "npm install && npm install --prefix backend && npm install --prefix frontend",
     "dev": "npm run dev --prefix backend",
-    "start": "npm start --prefix backend",
-    "build": "npm run build --prefix frontend",
+    "start": "cd backend && npm start",
+    "build": "cd backend && npm install",
     "seed": "npm run seed --prefix backend",
     "test": "npm run test --prefix backend && npm run test --prefix frontend",
     "lint": "npm run lint --prefix backend && npm run lint --prefix frontend",
