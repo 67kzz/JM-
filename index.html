@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JEETMASH</title>
+    <link rel="stylesheet" href="styles.css?v=1.2">
+</head>
+<body>
+
+    <!-- Main App -->
+    <div id="main-app" style="display: block">
+        <header>
+            <div class="header-container">
+                <div class="logo" onclick="event.preventDefault(); showSection('home')">
+                    <span class="logo-jeet">JEET</span><span class="logo-mash">MASH</span>
+                </div>
+                <nav>
+                    <a href="#" class="nav-link" onclick="event.preventDefault(); showSection('profiles')">All Profiles</a>
+                    <a href="#" class="nav-link" onclick="event.preventDefault(); scrollToElement('leaderboard-container')">Leaderboard</a>
+                </nav>
+
+
+                <!-- Add this Connect button -->
+        <button class="connect-wallet-btn" onclick="connectWallet()">wallet
+        </button>
+
+            </div>
+        </header>
+        
+        <div class="content-wrapper">
+            <!-- Home Section -->
+            <div id="home-section" class="section active">
+                <!-- Battle section header -->
+                <h1 class="section-title">Whos a bigger <span class="jeeting">Jeeting</span> fuck?</h1>
+                
+                <!-- Profile Battle Section -->
+                <div class="battle-container" id="battle-container">
+                    <div class="battle-stats-section">
+                        <div class="stats-container">
+                            <div class="stat-box">
+                                <div class="stat-label">Total Votes</div>
+                                <div class="stat-number" id="total-votes">23697</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="profiles-container">
+                        <!-- Left Profile -->
+                        <div class="profile-card" id="left-profile">
+                            <div class="winner-indicator">JEET</div>
+                            <div class="profile-image" style="cursor: pointer;">
+                                <!-- Will be populated by JavaScript -->
+                            </div>
+                            <div class="profile-username">Loading...</div>
+                            <div class="profile-handle">@loading</div>
+                            <div class="profile-bio">Loading profile...</div>
+                            <div class="profile-stats">
+                                <div class="profile-stat">
+                                    <div class="profile-stat-number">0</div>
+                                    <div class="profile-stat-label">Followers</div>
+                                </div>
+                                <div class="profile-stat">
+                                    <div class="profile-stat-number">0</div>
+                                    <div class="profile-stat-label">Following</div>
+                                </div>
+                                <div class="profile-stat">
+                                    <div class="profile-stat-number">0</div>
+                                    <div class="profile-stat-label">Posts</div>
+                                </div>
+                            </div>
+                            <button class="vote-btn">VOTE</button>
+                        </div>
+                        
+                        <div class="vs-divider">VS</div>
+                        
+                        <!-- Right Profile -->
+                        <div class="profile-card" id="right-profile">
+                            <div class="winner-indicator">JEET</div>
+                            <div class="profile-image" style="cursor: pointer;">
+                                <!-- Will be populated by JavaScript -->
+                            </div>
+                            <div class="profile-username">Loading...</div>
+                            <div class="profile-handle">@loading</div>
+                            <div class="profile-bio">Loading profile...</div>
+                            <div class="profile-stats">
+                                <div class="profile-stat">
+                                    <div class="profile-stat-number">0</div>
+                                    <div class="profile-stat-label">Followers</div>
+                                </div>
+                                <div class="profile-stat">
+                                    <div class="profile-stat-number">0</div>
+                                    <div class="profile-stat-label">Following</div>
+                                </div>
+                                <div class="profile-stat">
+                                    <div class="profile-stat-number">0</div>
+                                    <div class="profile-stat-label">Posts</div>
+                                </div>
+                            </div>
+                            <button class="vote-btn">VOTE</button>
+                        </div>
+                    </div>
+                    
+                    <div class="battle-results">
+                        <div class="results-bar">
+                            <div class="left-votes" id="left-bar" style="width: 58%"></div>
+                            <div class="right-votes" id="right-bar" style="width: 42%"></div>
+                        </div>
+                        <div class="results-text">
+                            <span id="left-percentage">58% voted for CryptoDegenKing</span>
+                            <span id="right-percentage">42% voted for PaperHandsPete</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Leaderboard Section -->
+                <div class="leaderboard-container" id="leaderboard-container">
+                    <div class="leaderboard-header">
+                        <h2>Leaderboard</h2>
+                        <div class="leaderboard-tabs">
+                            <button class="tab-btn active" onclick="showLeaderboardView('all')">All Time</button>
+                            <button class="tab-btn" onclick="showLeaderboardView('day')">Day</button>
+                            <button class="tab-btn" onclick="showLeaderboardView('week')">Week</button>
+                            <button class="tab-btn" onclick="showLeaderboardView('month')">Month</button>
+                        </div>
+                    </div>
+                    
+<div class="leaderboard-table">
+    <div class="table-header">
+        <div class="rank-col">Rank</div>
+        <div class="profile-col">Profile</div>
+        <div class="score-col">Battle Votes</div>
+    </div>
+    
+    <!-- Leaderboard rows will be dynamically added here -->
+</div>
+                </div>
+
+                <!-- Jeet Champions Section -->
+               <section class="jeet-champions-section">
+    <h2 class="jeet-champions-title">
+        <span class="trophy-icon">🏆</span>
+        Jeet Champions
+    </h2>
+    
+    <div class="champions-grid" id="champions-grid">
+        <!-- Champions will be dynamically added here -->
+    </div>
+                    
+                    <div class="champions-grid">
+                    </div>
+                </section>
+            </div>
+            <!-- End Home Section -->
+            
+            <!-- Profiles Section -->
+            <div id="profiles-section" class="section">
+                <div class="profiles-section">
+                    <div class="profiles-page-header">
+                        <h1 class="profiles-page-title">PROFILES</h1>
+                    </div>
+                    
+                    <div class="profiles-filters">
+                        <div class="filter-text">Profiles Filters Sort By</div>
+                        <div class="filter-text">Order By Descending</div>
+                    </div>
+                    
+                    <div class="profiles-grid">
+                        <!-- Profile tiles will be dynamically added here -->
+                    </div>
+                </div>
+            </div>
+            <!-- End Profiles Section -->
+            
+            <!-- Individual Profile Detail Section -->
+            <div id="profile-detail-section" class="section">
+                <div class="profile-detail-section">
+                    <div class="profile-detail-container">
+                        <a href="#" onclick="event.preventDefault(); showSection('home')" class="profile-back-btn">
+                            � Back to Home
+                        </a>
+                        
+<div class="profile-header-card">
+    <div class="profile-avatar-large" id="detail-avatar">👤</div>
+    <h1 class="profile-name-large" id="detail-name">Username</h1>
+    <p class="profile-handle-large" id="detail-handle">@handle</p>
+    <p class="profile-bio-section"></p>
+    
+    <div class="profile-quick-stats">
+        <div class="quick-stat">
+            <div class="quick-stat-value" id="detail-followers">12.1K</div>
+            <div class="quick-stat-label">Followers</div>
+        </div>
+        <div class="quick-stat">
+            <div class="quick-stat-value" id="detail-votes">0</div>
+            <div class="quick-stat-label">Votes</div>
+        </div>
+        <div class="quick-stat">
+            <div class="quick-stat-value" id="detail-score">0</div>
+            <div class="quick-stat-label">Jeet Score</div>
+        </div>
+    </div>
+    
+    <div class="profile-actions">
+        <button class="follow-btn">Follow</button>
+        <button class="share-btn">Share</button>
+    </div>
+    
+<!-- Integrated Stats Section -->
+<div class="profile-integrated-stats">
+    <div class="integrated-stat">
+        <div class="integrated-stat-icon">=�</div>
+        <div class="integrated-stat-content">
+            <div class="integrated-stat-label">Battle Votes</div>
+            <div class="integrated-stat-change positive">total votes</div>
+        </div>
+    </div>
+    
+    <div class="integrated-stat">
+        <div class="integrated-stat-icon">�</div>
+        <div class="integrated-stat-content">
+            <div class="integrated-stat-value" id="detail-wins">0</div>
+            <div class="integrated-stat-label">Battles Won</div>
+            <div class="integrated-stat-change positive">victories</div>
+        </div>
+    </div>
+    
+    <div class="integrated-stat">
+        <div class="integrated-stat-icon">=%</div>
+        <div class="integrated-stat-content">
+            <div class="integrated-stat-value" id="detail-winrate">0%</div>
+            <div class="integrated-stat-label">Win Rate</div>
+            <div class="integrated-stat-change">success rate</div>
+        </div>
+    </div>
+    
+    <div class="integrated-stat">
+        <div class="integrated-stat-icon">🗳️</div>
+        <div class="integrated-stat-content">
+            <div class="integrated-stat-value" id="detail-comments">0</div>
+            <div class="integrated-stat-label">Comments</div>
+            <div class="integrated-stat-change">total comments</div>
+        </div>
+    </div>
+</div>
+
+    
+    <!-- Chad/Jeet Voting Section -->
+    <div class="profile-voting-section">
+        <div class="profile-vote-buttons">
+            <button class="chad-vote-btn" onclick="handleProfileVote('chad')">
+                <span class="vote-icon">👍</span>
+                <span class="vote-count" id="chad-count">0</span>
+                <span class="vote-label">CHAD</span>
+            </button>
+            
+            <button class="jeet-vote-btn" onclick="handleProfileVote('jeet')">
+                <span class="vote-icon">👎</span>
+                <span class="vote-count" id="jeet-count">0</span>
+                <span class="vote-label">JEET</span>
+            </button>
+        </div>
+        
+        <div class="vote-percentage-bar">
+            <div class="chad-percentage" id="chad-percentage" ></div>
+            <div class="jeet-percentage" id="jeet-percentage" ></div>
+        </div>
+        
+        <div class="vote-stats">
+            <span class="chad-stat">99% Chad</span>
+            <span class="jeet-stat">1% Jeet</span>
+        </div>
+    </div>
+</div>
+                        
+                        <div class="profile-stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-card-icon">=�</div>
+                                <div class="stat-card-value" id="detail-marketcap">$19.8K</div>
+                                <div class="stat-card-label">Market Cap</div>
+                                <div class="stat-card-change positive" id="detail-change">+0.77%</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-card-icon">�</div>
+                                <div class="stat-card-value">156</div>
+                                <div class="stat-card-label">Battles Won</div>
+                                <div class="stat-card-change positive">+12%</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-card-icon">=%</div>
+                                <div class="stat-card-value">89%</div>
+                                <div class="stat-card-label">Win Rate</div>
+                                <div class="stat-card-change negative">-2%</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-card-icon">=�</div>
+                                <div class="stat-card-value">1.2K</div>
+                                <div class="stat-card-label">Comments</div>
+                                <div class="stat-card-change positive">+48</div>
+                            </div>
+                        </div>
+                        
+                        <div class="comments-section">
+                            <div class="comments-header">
+                                <h3 class="comments-title">Community Comments</h3>
+                                <span class="comments-count">3 comments</span>
+                            </div>
+                            
+                            <div class="comment-form">
+                                <div class="comment-input-wrapper">
+                                    <div class="comment-user-avatar">Y</div>
+                                    <div class="comment-input-container">
+                                        <textarea class="comment-textarea" placeholder="Share your thoughts about this jeet..." id="profile-comment-textarea"></textarea>
+                                        <div class="comment-actions">
+                                            <div class="comment-options">
+                                                <button class="comment-option">=
+</button>
+                                                <button class="comment-option">=�</button>
+                                                <button class="comment-option">=</button>
+                                            </div>
+                                            <button class="submit-comment-btn" id="profile-submit-comment">Comment</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="comments-list" id="profile-comments-list">
+                              
+                                
+                               
+                                </div>
+                                
+                                
+                                       
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        <!-- End content-wrapper -->
+    
+    <!-- End Main App -->
+    
+    <!-- Live Debug Overlay -->
+    <div id="debug-overlay" style="display: none;">
+        <div class="debug-header">
+            <div class="debug-status">
+                <span class="debug-dot"></span>
+                <span class="debug-title">LIVE DEBUG</span>
+            </div>
+            <button class="debug-close" onclick="toggleDebug()"></button>
+        </div>
+        
+        <div class="debug-content">
+            <div class="debug-section">
+                <div class="debug-label">CURRENT BATTLES:</div>
+                <div class="debug-battle" id="debug-current-battle">
+                    <span class="debug-username1">Hydraze</span>
+                    <span class="debug-vs">=+ � vs</span>
+                    <span class="debug-username2">sling (>�,<�)</span>
+                </div>
+            </div>
+            
+            <div class="debug-section">
+                <div class="debug-label">TOP 10 LEADERBOARD:</div>
+                <div class="debug-leaderboard" id="debug-leaderboard">
+                    <!-- Debug leaderboard entries will be dynamically added here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Debug Toggle Button -->
+    <button class="debug-toggle-btn" onclick="toggleDebug()">
+        <span class="debug-icon">=</span>
+        <span>Debug</span>
+    </button>
+    <script src="frontend/api-service.js"></script>
+    <script src="wallet-connection.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

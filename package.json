@@ -1,0 +1,41 @@
+{
+  "name": "jeetmash-monorepo",
+  "version": "1.0.0",
+  "description": "JEETMASH - Crypto Profile Battle Platform",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "install:all": "npm install && npm install --prefix backend && npm install --prefix frontend",
+    "dev": "npm run dev --prefix backend",
+    "start": "npm start --prefix backend",
+    "build": "npm run build --prefix frontend",
+    "seed": "npm run seed --prefix backend",
+    "test": "npm run test --prefix backend && npm run test --prefix frontend",
+    "lint": "npm run lint --prefix backend && npm run lint --prefix frontend",
+    "lint:fix": "npm run lint:fix --prefix backend && npm run lint:fix --prefix frontend",
+    "clean": "rm -rf node_modules backend/node_modules frontend/node_modules",
+    "setup": "cp .env.example .env && npm run install:all && npm run seed",
+    "health": "curl http://localhost:3001/health"
+  },
+  "keywords": [
+    "crypto",
+    "solana",
+    "voting",
+    "battle",
+    "web3",
+    "phantom-wallet"
+  ],
+  "author": "JEETMASH Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/jeetmash.git"
+  }
+}
