@@ -278,13 +278,15 @@ async function seedDatabase() {
 // MongoDB connection with proper error handling
 console.log('🔍 DEBUGGING: MONGODB_URI exists?', !!process.env.MONGODB_URI);
 console.log('🔍 DEBUGGING: NODE_ENV:', process.env.NODE_ENV);
+console.log('🔍 DEBUGGING: All env vars:', Object.keys(process.env).filter(key => key.includes('MONGO')));
 
-// Use hardcoded Atlas connection for Railway deployment
+// Use hardcoded Atlas connection for Railway deployment - TRY NEW CLUSTER FIRST
 const mongoUri = process.env.MONGODB_URI || 
-    'mongodb+srv://db_UKN:db_Scoobydoo123@cluster0.yrlcihx.mongodb.net/jeetmash?retryWrites=true&w=majority';
+    'mongodb+srv://jeetmash_user:SimplePass123@jm-cluster.6apqdib.mongodb.net/?retryWrites=true&w=majority&appName=JM-cluster';
 
 console.log('🔗 Connecting to MongoDB Atlas...');
 console.log('🔗 Using connection string:', mongoUri.replace(/:[^:]*@/, ':****@'));
+console.log('🔗 Full connection string for debugging:', mongoUri);
 
 mongoose.connect(mongoUri, {
     useNewUrlParser: true,
