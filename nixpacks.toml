@@ -1,14 +1,8 @@
 [phases.setup]
-nixPkgs = ['nodejs-18_x']
+nixPkgs = ['nodejs_18']
 
 [phases.install]
-cmds = ['npm install --prefix backend']
-
-[phases.build]
-cmds = ['echo "Backend ready for deployment"']
+cmds = ['cd backend', 'npm install --production']
 
 [start]
 cmd = 'cd backend && node server.js'
-
-[variables]
-NODE_ENV = 'production'
