@@ -3,10 +3,6 @@
   "version": "1.0.0",
   "description": "JEETMASH - Crypto Profile Battle Platform",
   "private": true,
-  "workspaces": [
-    "frontend",
-    "backend"
-  ],
   "scripts": {
     "install:all": "npm install && npm install --prefix backend && npm install --prefix frontend",
     "dev": "npm run dev --prefix backend",
