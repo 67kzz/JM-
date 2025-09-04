@@ -2,7 +2,10 @@
 
 class APIService {
     constructor() {
-this.baseURL = 'http://localhost:3001/api';
+        // Use Railway URL in production, localhost in development
+        this.baseURL = window.location.hostname === 'localhost' 
+            ? 'http://localhost:3001/api' 
+            : 'https://web-production-ec607.up.railway.app/api';
         this.token = localStorage.getItem('jeetmash_token');
         this.currentUser = null;
     }
