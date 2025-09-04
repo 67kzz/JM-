@@ -177,16 +177,23 @@ const notFound = (req, res, next) => {
 };
 
 // MongoDB connection with proper error handling
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/jeetmash', {
+console.log('🔍 DEBUGGING: MONGODB_URI exists?', !!process.env.MONGODB_URI);
+console.log('🔍 DEBUGGING: Connection string:', process.env.MONGODB_URI ? 'FOUND' : 'NOT FOUND - using fallback');
+
+const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/jeetmash';
+console.log('🔗 Connecting to MongoDB...');
+
+mongoose.connect(mongoUri, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     maxPoolSize: 10,
     serverSelectionTimeoutMS: 5000,
     socketTimeoutMS: 45000,
 })
-.then(() => console.log('MongoDB connected successfully'))
+.then(() => console.log('✅ MongoDB connected successfully'))
 .catch(err => {
-    console.error('MongoDB connection error:', err);
+    console.error('❌ MongoDB connection error:', err);
+    console.error('💡 Make sure to set MONGODB_URI environment variable on Railway!');
     process.exit(1);
 });
 
