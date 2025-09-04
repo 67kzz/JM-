@@ -178,23 +178,32 @@ const notFound = (req, res, next) => {
 
 // MongoDB connection with proper error handling
 console.log('🔍 DEBUGGING: MONGODB_URI exists?', !!process.env.MONGODB_URI);
-console.log('🔍 DEBUGGING: Connection string:', process.env.MONGODB_URI ? 'FOUND' : 'NOT FOUND - using fallback');
+console.log('🔍 DEBUGGING: NODE_ENV:', process.env.NODE_ENV);
 
-const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/jeetmash';
-console.log('🔗 Connecting to MongoDB...');
+// Use hardcoded Atlas connection for Railway deployment
+const mongoUri = process.env.MONGODB_URI || 
+    'mongodb+srv://db_UKN:db_Scoobydoo123@cluster0.yrlcihx.mongodb.net/jeetmash?retryWrites=true&w=majority';
+
+console.log('🔗 Connecting to MongoDB Atlas...');
+console.log('🔗 Using connection string:', mongoUri.replace(/:[^:]*@/, ':****@'));
 
 mongoose.connect(mongoUri, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     maxPoolSize: 10,
-    serverSelectionTimeoutMS: 5000,
+    serverSelectionTimeoutMS: 10000,
     socketTimeoutMS: 45000,
+    bufferMaxEntries: 0,
+    bufferCommands: false,
 })
-.then(() => console.log('✅ MongoDB connected successfully'))
+.then(() => {
+    console.log('✅ MongoDB connected successfully');
+    console.log('✅ Database:', mongoose.connection.name);
+})
 .catch(err => {
     console.error('❌ MongoDB connection error:', err);
-    console.error('💡 Make sure to set MONGODB_URI environment variable on Railway!');
-    process.exit(1);
+    console.error('💡 Connection string format or network access issue');
+    // Don't exit, let the app run without database for now
 });
 
 // ==================== SCHEMAS ====================
@@ -690,8 +699,15 @@ app.get('/health', (req, res) => {
 });
 
 // ==================== SERVE STATIC FILES ==================== 
-// Serve static files from frontend directory
-app.use(express.static(path.join(__dirname, '../frontend')));
+// Serve static files from root directory (where index.html is located)
+app.use(express.static(path.join(__dirname, '../')));
+// Also serve frontend directory for JS files
+app.use('/frontend', express.static(path.join(__dirname, '../frontend')));
+
+// Serve index.html for the root route
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '../index.html'));
+});
 
 // Apply error handlers BEFORE catch-all route
 app.use(notFound);
