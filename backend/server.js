@@ -176,6 +176,70 @@ const notFound = (req, res, next) => {
     next(error);
 };
 
+// Auto-seed function for Railway deployment
+async function seedDatabase() {
+    try {
+        const sampleProfiles = [
+            {
+                username: "CryptoDegenKing",
+                handle: "@cryptodegenking",
+                twitterHandle: "cryptodegenking",
+                bio: "Diamond hands 💎🙌 to the moon 🚀",
+                followers: "12.1K",
+                following: "420",
+                posts: "2,847",
+                image: "👑",
+                emoji: "💎",
+                change: "+0.77%",
+                votes: 1250,
+                score: 8.5,
+                battleWins: 15,
+                chadVotes: 980,
+                jeetVotes: 270
+            },
+            {
+                username: "PaperHandsPete",
+                handle: "@paperhandspete",
+                twitterHandle: "paperhandspete",
+                bio: "Bought high, sold low 📉 FML",
+                followers: "8.3K",
+                following: "1.2K",
+                posts: "5,432",
+                image: "🧻",
+                emoji: "📉",
+                change: "-12.34%",
+                votes: 890,
+                score: 3.2,
+                battleWins: 5,
+                chadVotes: 200,
+                jeetVotes: 690
+            },
+            {
+                username: "HODLMaster",
+                handle: "@hodlmaster",
+                twitterHandle: "hodlmaster",
+                bio: "Never selling, diamond hands forever 💎",
+                followers: "25.7K",
+                following: "333",
+                posts: "1,234",
+                image: "💎",
+                emoji: "🚀",
+                change: "+45.67%",
+                votes: 2100,
+                score: 9.1,
+                battleWins: 28,
+                chadVotes: 1800,
+                jeetVotes: 300
+            }
+        ];
+        
+        await Profile.insertMany(sampleProfiles);
+        console.log('✅ Sample profiles created successfully');
+    } catch (error) {
+        console.error('❌ Seeding error:', error);
+    }
+}
+
 // MongoDB connection with proper error handling
 console.log('🔍 DEBUGGING: MONGODB_URI exists?', !!process.env.MONGODB_URI);
 console.log('🔍 DEBUGGING: NODE_ENV:', process.env.NODE_ENV);
@@ -196,9 +260,18 @@ mongoose.connect(mongoUri, {
     bufferMaxEntries: 0,
     bufferCommands: false,
 })
-.then(() => {
+.then(async () => {
     console.log('✅ MongoDB connected successfully');
     console.log('✅ Database:', mongoose.connection.name);
+    
+    // Check if we need to seed the database
+    const profileCount = await Profile.countDocuments();
+    if (profileCount === 0) {
+        console.log('🌱 Database is empty, seeding with sample data...');
+        await seedDatabase();
+    } else {
+        console.log(`📊 Database has ${profileCount} profiles`);
+    }
 })
 .catch(err => {
     console.error('❌ MongoDB connection error:', err);
