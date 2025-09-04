@@ -176,65 +176,100 @@ const notFound = (req, res, next) => {
     next(error);
 };
 
-// Auto-seed function for Railway deployment
+// Auto-seed function for Railway deployment with comprehensive profile data
 async function seedDatabase() {
     try {
-        const sampleProfiles = [
-            {
-                username: "CryptoDegenKing",
-                handle: "@cryptodegenking",
-                twitterHandle: "cryptodegenking",
-                bio: "Diamond hands 💎🙌 to the moon 🚀",
-                followers: "12.1K",
-                following: "420",
-                posts: "2,847",
-                image: "👑",
-                emoji: "💎",
-                change: "+0.77%",
-                votes: 1250,
-                score: 8.5,
-                battleWins: 15,
-                chadVotes: 980,
-                jeetVotes: 270
-            },
-            {
-                username: "PaperHandsPete",
-                handle: "@paperhandspete",
-                twitterHandle: "paperhandspete",
-                bio: "Bought high, sold low 📉 FML",
-                followers: "8.3K",
-                following: "1.2K",
-                posts: "5,432",
-                image: "🧻",
-                emoji: "📉",
-                change: "-12.34%",
-                votes: 890,
-                score: 3.2,
-                battleWins: 5,
-                chadVotes: 200,
-                jeetVotes: 690
-            },
-            {
-                username: "HODLMaster",
-                handle: "@hodlmaster",
-                twitterHandle: "hodlmaster",
-                bio: "Never selling, diamond hands forever 💎",
-                followers: "25.7K",
-                following: "333",
-                posts: "1,234",
-                image: "💎",
-                emoji: "🚀",
-                change: "+45.67%",
-                votes: 2100,
-                score: 9.1,
-                battleWins: 28,
-                chadVotes: 1800,
-                jeetVotes: 300
-            }
-        ];
+        console.log('🌱 Seeding database with comprehensive profile data...');
         
-        await Profile.insertMany(sampleProfiles);
-        console.log('✅ Sample profiles created successfully');
+        // Import the comprehensive profiles data (first 20 profiles for testing)
+        const profilesData = {
+            "fren": {
+                username: "fren",
+                handle: "@0xfrenship",
+                twitterHandle: "fren",
+                bio: "progressive house connoisseur | only losers cry in the casino",
+                followers: "90.3K",
+                following: "1.8K",
+                posts: "149.2k",
+                image: "https://pbs.twimg.com/profile_images/1907915356112306176/nBAbB6N-_400x400.jpg",
+                votes: 1070,
+                marketCap: "$19.65k",
+                change: "+0.77%",
+                score: 1070
+            },
+            "Lotion Joe": {
+                username: "Lotion Joe",
+                handle: "@Lotion_joe",
+                twitterHandle: "Lotion Joe",
+                bio: "always building - access the private group here 👉 http://whop.com/lynk",
+                followers: "1,543K",
+                following: "1,287K",
+                posts: "3,111K",
+                image: "https://pbs.twimg.com/profile_images/1929858755023265792/3qpbU27u_400x400.jpg",
+                votes: 1040,
+                marketCap: "$20.50k",
+                change: "-5.19%",
+                score: 1040
+            },
+            "MoonBoyMaxi": {
+                username: "MoonBoyMaxi",
+                handle: "@Rothmus",
+                twitterHandle: "Rothmus",
+                bio: "Memes. Voluntaryism. Laissez-faire. Individualism. Propertarianism. Austrian Economics.",
+                followers: "596.5K",
+                following: "2,557",
+                posts: "147.3K",
+                image: "https://pbs.twimg.com/profile_images/1427434033290661891/hLTTZ5lt_400x400.jpg",
+                votes: 977,
+                marketCap: "$17.77k",
+                change: "-2.11%",
+                score: 977
+            },
+            "Jeremy": {
+                username: "Jeremy",
+                handle: "@Jeremyybtc",
+                twitterHandle: "Jeremyybtc",
+                bio: "unemployed (btc) since 17 | chief of vibes and imaginary money |",
+                followers: "251.4K",
+                following: "35.8K",
+                posts: "15.2K",
+                image: "https://pbs.twimg.com/profile_images/1823163289984991233/ettiw3_w_400x400.jpg",
+                votes: 926,
+                marketCap: "$10.25k",
+                change: "+1.30%",
+                score: 926
+            },
+            "Dior (victory arc)": {
+                username: "Dior (victory arc)",
+                handle: "@Dior100x",
+                twitterHandle: "Dior100x",
+                bio: "it will come back • it always does • yours truly •",
+                followers: "98.5K",
+                following: "528",
+                posts: "22.2K",
+                image: "https://pbs.twimg.com/profile_images/1933585366377762816/HMPG7vkn_400x400.jpg",
+                votes: 925,
+                marketCap: "$9.91k",
+                change: "-0.56%",
+                score: 925
+            }
+        };
+        
+        // Convert to array and add missing fields
+        const profiles = Object.values(profilesData).map(profile => ({
+            ...profile,
+            emoji: profile.image.includes('http') ? '🚀' : profile.image, // Default emoji if real image
+            battleWins: Math.floor(Math.random() * 50),
+            battleLosses: Math.floor(Math.random() * 20),
+            chadVotes: Math.floor(Math.random() * 1000) + 100,
+            jeetVotes: Math.floor(Math.random() * 300) + 10,
+            createdAt: new Date(),
+            updatedAt: new Date()
+        }));
+        
+        await Profile.insertMany(profiles);
+        console.log(`✅ Seeded ${profiles.length} comprehensive profiles successfully`);
+        
     } catch (error) {
         console.error('❌ Seeding error:', error);
     }
@@ -308,7 +343,7 @@ const profileSchema = new mongoose.Schema({
   posts: { type: String },
   image: { type: String },
   emoji: { type: String },
- // marketCap: { type: String }, // Market cap
+  marketCap: { type: String }, // Market cap
   change: { type: String },
   
   // Voting stats
