@@ -15,15 +15,34 @@
                 <div class="logo" onclick="event.preventDefault(); showSection('home')">
                     <span class="logo-jeet">JEET</span><span class="logo-mash">MASH</span>
                 </div>
-                <nav>
-                    <a href="#" class="nav-link" onclick="event.preventDefault(); showSection('profiles')">All Profiles</a>
-                    <a href="#" class="nav-link" onclick="event.preventDefault(); scrollToElement('leaderboard-container')">Leaderboard</a>
-                </nav>
-
+                <!-- Center Icons -->
+                <div class="header-center-icons">
+                    <a href="#" class="nav-icon-link" onclick="event.preventDefault(); showSection('profiles')" title="All Profiles">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                        </svg>
+                    </a>
+                    <a href="#" class="nav-icon-link" onclick="event.preventDefault(); scrollToElement('leaderboard-container')" title="Leaderboard">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M7.5 21H2V9h5.5v12zm7.25-18h-5.5v18h5.5V3zM22 11h-5.5v10H22V11z"/>
+                        </svg>
+                    </a>
+                    <a href="https://x.com" target="_blank" class="nav-icon-link" title="X (Twitter)">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                        </svg>
+                    </a>
+                    <a href="https://t.me" target="_blank" class="nav-icon-link" title="Telegram">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+                        </svg>
+                    </a>
+                </div>
 
                 <!-- Add this Connect button -->
-        <button class="connect-wallet-btn" onclick="connectWallet()">wallet
-        </button>
+                <button class="connect-wallet-btn" id="connect-wallet-btn">
+                    <span>Wallet</span>
+                </button>
 
             </div>
         </header>
@@ -36,11 +55,26 @@
                 
                 <!-- Profile Battle Section -->
                 <div class="battle-container" id="battle-container">
-                    <div class="battle-stats-section">
-                        <div class="stats-container">
-                            <div class="stat-box">
-                                <div class="stat-label">Total Votes</div>
-                                <div class="stat-number" id="total-votes">23697</div>
+                    <div class="battle-stats-bar">
+                        <div class="stats-bar-inner">
+                            <div class="stat-item">
+                                <span class="stat-value" id="total-votes">1.2M</span>
+                                <span class="stat-label">Total Votes</span>
+                            </div>
+                            <div class="stat-divider"></div>
+                            <div class="stat-item">
+                                <span class="stat-value" id="profiles-count">12.4K</span>
+                                <span class="stat-label">Profiles</span>
+                            </div>
+                            <div class="stat-divider"></div>
+                            <div class="stat-item">
+                                <span class="stat-value" id="battles-today">47.8K</span>
+                                <span class="stat-label">Battles Today</span>
+                            </div>
+                            <div class="stat-divider hide-mobile"></div>
+                            <div class="stat-item hide-mobile">
+                                <span class="stat-value live" id="live-users">892</span>
+                                <span class="stat-label">Live Now</span>
                             </div>
                         </div>
                     </div>
@@ -139,7 +173,6 @@
                 <!-- Jeet Champions Section -->
                <section class="jeet-champions-section">
     <h2 class="jeet-champions-title">
-        <span class="trophy-icon">🏆</span>
         Jeet Champions
     </h2>
     
@@ -157,16 +190,30 @@
             <div id="profiles-section" class="section">
                 <div class="profiles-section">
                     <div class="profiles-page-header">
-                        <h1 class="profiles-page-title">PROFILES</h1>
+                        <h1 class="profiles-page-title">All Profiles</h1>
+                        <p class="profiles-page-subtitle">Browse and discover crypto influencers</p>
                     </div>
-                    
-                    <div class="profiles-filters">
-                        <div class="filter-text">Profiles Filters Sort By</div>
-                        <div class="filter-text">Order By Descending</div>
+
+                    <div class="profiles-toolbar">
+                        <div class="profiles-search">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"/>
+                                <path d="m21 21-4.35-4.35"/>
+                            </svg>
+                            <input type="text" placeholder="Search profiles..." id="profiles-search-input">
+                        </div>
+                        <div class="profiles-sort">
+                            <select id="profiles-sort-select">
+                                <option value="votes">Most Votes</option>
+                                <option value="followers">Most Followers</option>
+                                <option value="score">Highest Score</option>
+                                <option value="recent">Recently Added</option>
+                            </select>
+                        </div>
                     </div>
-                    
-                    <div class="profiles-grid">
-                        <!-- Profile tiles will be dynamically added here -->
+
+                    <div class="profiles-grid" id="profiles-grid">
+                        <!-- Profile cards will be dynamically added here -->
                     </div>
                 </div>
             </div>
@@ -176,12 +223,11 @@
             <div id="profile-detail-section" class="section">
                 <div class="profile-detail-section">
                     <div class="profile-detail-container">
-                        <a href="#" onclick="event.preventDefault(); showSection('home')" class="profile-back-btn">
-                            � Back to Home
+                        <a href="#" onclick="event.preventDefault(); showSection('home')" class="profile-back-btn">Back to Home
                         </a>
                         
 <div class="profile-header-card">
-    <div class="profile-avatar-large" id="detail-avatar">👤</div>
+    <div class="profile-avatar-large" id="detail-avatar"></div>
     <h1 class="profile-name-large" id="detail-name">Username</h1>
     <p class="profile-handle-large" id="detail-handle">@handle</p>
     <p class="profile-bio-section"></p>
@@ -209,7 +255,6 @@
 <!-- Integrated Stats Section -->
 <div class="profile-integrated-stats">
     <div class="integrated-stat">
-        <div class="integrated-stat-icon">=�</div>
         <div class="integrated-stat-content">
             <div class="integrated-stat-label">Battle Votes</div>
             <div class="integrated-stat-change positive">total votes</div>
@@ -217,7 +262,6 @@
     </div>
     
     <div class="integrated-stat">
-        <div class="integrated-stat-icon">�</div>
         <div class="integrated-stat-content">
             <div class="integrated-stat-value" id="detail-wins">0</div>
             <div class="integrated-stat-label">Battles Won</div>
@@ -226,7 +270,6 @@
     </div>
     
     <div class="integrated-stat">
-        <div class="integrated-stat-icon">=%</div>
         <div class="integrated-stat-content">
             <div class="integrated-stat-value" id="detail-winrate">0%</div>
             <div class="integrated-stat-label">Win Rate</div>
@@ -235,7 +278,6 @@
     </div>
     
     <div class="integrated-stat">
-        <div class="integrated-stat-icon">🗳️</div>
         <div class="integrated-stat-content">
             <div class="integrated-stat-value" id="detail-comments">0</div>
             <div class="integrated-stat-label">Comments</div>
@@ -249,13 +291,11 @@
     <div class="profile-voting-section">
         <div class="profile-vote-buttons">
             <button class="chad-vote-btn" onclick="handleProfileVote('chad')">
-                <span class="vote-icon">👍</span>
                 <span class="vote-count" id="chad-count">0</span>
                 <span class="vote-label">CHAD</span>
             </button>
             
             <button class="jeet-vote-btn" onclick="handleProfileVote('jeet')">
-                <span class="vote-icon">👎</span>
                 <span class="vote-count" id="jeet-count">0</span>
                 <span class="vote-label">JEET</span>
             </button>
@@ -272,28 +312,72 @@
         </div>
     </div>
 </div>
-                        
+
+<!-- Projects Section -->
+<div class="projects-section" id="projects-section">
+    <div class="projects-header">
+        <h3 class="projects-title">Projects</h3>
+        <span class="projects-count" id="projects-count">0 projects</span>
+    </div>
+    <div class="projects-tabs" id="projects-tabs">
+        <button type="button" class="projects-tab active" data-filter="all">All</button>
+        <button type="button" class="projects-tab" data-filter="bull">Bull Calls</button>
+        <button type="button" class="projects-tab" data-filter="promoted">Promoted</button>
+    </div>
+    <div class="projects-grid" id="projects-grid">
+        <!-- Projects will be dynamically added here -->
+    </div>
+</div>
+
+<!-- Project Lightbox -->
+<div class="project-lightbox" id="project-lightbox">
+    <div class="lightbox-overlay" onclick="ProjectsModule.closeLightbox()"></div>
+    <div class="lightbox-content">
+        <button class="lightbox-close" onclick="ProjectsModule.closeLightbox()">x</button>
+        <div class="lightbox-image-section">
+            <span class="lightbox-result-badge" id="lightbox-result"></span>
+            <img src="" alt="" id="lightbox-image">
+        </div>
+        <div class="lightbox-info">
+            <div class="lightbox-header">
+                <div>
+                    <span class="lightbox-name" id="lightbox-name"></span>
+                    <span class="lightbox-ticker" id="lightbox-ticker"></span>
+                </div>
+                <span class="lightbox-type" id="lightbox-type"></span>
+            </div>
+            <p class="lightbox-description" id="lightbox-description"></p>
+            <div class="lightbox-call-type" id="lightbox-call-type" style="display: none;"></div>
+            <span class="lightbox-date" id="lightbox-date"></span>
+            <a href="#" class="lightbox-dex-btn" id="lightbox-dex-btn" target="_blank" rel="noopener noreferrer">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                    <polyline points="15 3 21 3 21 9"></polyline>
+                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+                View on DEX Screener
+            </a>
+        </div>
+    </div>
+</div>
+
                         <div class="profile-stats-grid">
                             <div class="stat-card">
-                                <div class="stat-card-icon">=�</div>
                                 <div class="stat-card-value" id="detail-marketcap">$19.8K</div>
                                 <div class="stat-card-label">Market Cap</div>
                                 <div class="stat-card-change positive" id="detail-change">+0.77%</div>
                             </div>
                             <div class="stat-card">
-                                <div class="stat-card-icon">�</div>
                                 <div class="stat-card-value">156</div>
                                 <div class="stat-card-label">Battles Won</div>
                                 <div class="stat-card-change positive">+12%</div>
                             </div>
                             <div class="stat-card">
-                                <div class="stat-card-icon">=%</div>
                                 <div class="stat-card-value">89%</div>
                                 <div class="stat-card-label">Win Rate</div>
                                 <div class="stat-card-change negative">-2%</div>
                             </div>
                             <div class="stat-card">
-                                <div class="stat-card-icon">=�</div>
                                 <div class="stat-card-value">1.2K</div>
                                 <div class="stat-card-label">Comments</div>
                                 <div class="stat-card-change positive">+48</div>
@@ -312,12 +396,7 @@
                                     <div class="comment-input-container">
                                         <textarea class="comment-textarea" placeholder="Share your thoughts about this jeet..." id="profile-comment-textarea"></textarea>
                                         <div class="comment-actions">
-                                            <div class="comment-options">
-                                                <button class="comment-option">=
-</button>
-                                                <button class="comment-option">=�</button>
-                                                <button class="comment-option">=</button>
-                                            </div>
+                                            <div class="comment-options"></div>
                                             <button class="submit-comment-btn" id="profile-submit-comment">Comment</button>
                                         </div>
                                     </div>
@@ -350,7 +429,10 @@
                 <span class="debug-dot"></span>
                 <span class="debug-title">LIVE DEBUG</span>
             </div>
-            <button class="debug-close" onclick="toggleDebug()"></button>
+            <div class="debug-header-buttons">
+                <button class="debug-minimize" onclick="DebugModule.toggleMinimize()">-</button>
+                <button class="debug-close" onclick="toggleDebug()">x</button>
+            </div>
         </div>
         
         <div class="debug-content">
@@ -378,7 +460,7 @@
         <span>Debug</span>
     </button>
     <script src="frontend/api-service.js"></script>
-    <script src="wallet-connection.js"></script>
-    <script src="script.js"></script>
+    <script src="frontend/wallet-connection.js"></script>
+    <script src="frontend/script.js"></script>
 </body>
 </html>

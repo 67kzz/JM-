@@ -39,6 +39,124 @@ class AppState {
 
 const appState = new AppState();
 
+// ==================== GLOBAL STATS MODULE ====================
+const GlobalStatsModule = {
+    stats: null,
+    isLoading: false,
+
+    async fetchStats() {
+        if (this.isLoading) return;
+        this.isLoading = true;
+
+        try {
+            const response = await window.apiService.getGlobalStats();
+            if (response.success) {
+                this.stats = response.stats;
+                this.updateDisplay();
+            }
+        } catch (error) {
+            console.error('Failed to fetch global stats:', error);
+        } finally {
+            this.isLoading = false;
+        }
+    },
+
+    updateDisplay() {
+        if (!this.stats) return;
+
+        this.animateValue('global-jeet-votes', this.stats.totalJeetVotes);
+        this.animateValue('global-chad-votes', this.stats.totalChadVotes);
+        this.animateValue('global-total-votes', this.stats.totalVotes);
+
+        const percentageEl = document.getElementById('global-jeet-percentage');
+        if (percentageEl) {
+            percentageEl.textContent = `${this.stats.jeetPercentage}%`;
+            percentageEl.classList.add('updating');
+            setTimeout(() => percentageEl.classList.remove('updating'), 300);
+        }
+    },
+
+    animateValue(elementId, newValue) {
+        const el = document.getElementById(elementId);
+        if (!el) return;
+
+        const currentValue = parseInt(el.textContent.replace(/,/g, '')) || 0;
+
+        // If values are the same, just update display
+        if (currentValue === newValue) {
+            el.textContent = this.formatNumber(newValue);
+            return;
+        }
+
+        // Animate the counter
+        el.classList.add('updating');
+
+        const duration = 500;
+        const steps = 20;
+        const increment = (newValue - currentValue) / steps;
+        let current = currentValue;
+        let step = 0;
+
+        const animate = () => {
+            step++;
+            current += increment;
+
+            if (step >= steps) {
+                el.textContent = this.formatNumber(newValue);
+                el.classList.remove('updating');
+            } else {
+                el.textContent = this.formatNumber(Math.round(current));
+                requestAnimationFrame(animate);
+            }
+        };
+
+        requestAnimationFrame(animate);
+    },
+
+    formatNumber(num) {
+        if (num >= 1000000) {
+            return (num / 1000000).toFixed(1) + 'M';
+        } else if (num >= 1000) {
+            return (num / 1000).toFixed(1) + 'K';
+        }
+        return num.toLocaleString();
+    },
+
+    // Call this when a vote is cast to update stats
+    incrementJeetVotes() {
+        if (this.stats) {
+            this.stats.totalJeetVotes++;
+            this.stats.totalVotes++;
+            this.stats.jeetPercentage = Math.round(
+                (this.stats.totalJeetVotes / this.stats.totalVotes) * 100
+            );
+            this.updateDisplay();
+        }
+    },
+
+    incrementChadVotes() {
+        if (this.stats) {
+            this.stats.totalChadVotes++;
+            this.stats.totalVotes++;
+            this.stats.jeetPercentage = Math.round(
+                (this.stats.totalJeetVotes / this.stats.totalVotes) * 100
+            );
+            this.updateDisplay();
+        }
+    },
+
+    init() {
+        this.fetchStats();
+        // Refresh stats every 30 seconds
+        setInterval(() => this.fetchStats(), 30000);
+    }
+};
+
+// Initialize global stats on load
+document.addEventListener('DOMContentLoaded', () => {
+    GlobalStatsModule.init();
+});
+
 // ==================== AUDIO MANAGER ====================
 class AudioManager {
     static playSound(type, duration = 0.03) {
@@ -163,7 +281,7 @@ const ProfileModule = {
         if (profile.image) {
             return `<img src="${profile.image}" alt="${profile.username}" style="width: 100%; height: 100%; object-fit: cover;">`;
         }
-        return profile.emoji || '👤';
+        return '';
     },
     
     async showProfileDetail(username) {
@@ -200,11 +318,11 @@ const ProfileModule = {
                 };
                 img.onerror = function() {
                     console.warn('Failed to load profile image, using fallback');
-                    avatarElement.innerHTML = profile.emoji || '👤';
+                    avatarElement.innerHTML = '';
                 };
                 img.src = profile.image;
             } else {
-                avatarElement.innerHTML = profile.emoji || '👤';
+                avatarElement.innerHTML = '';
             }
             
             // Update stats
@@ -251,6 +369,9 @@ function resetProfileVotes() {
 // Make it globally accessible
 window.resetProfileVotes = resetProfileVotes;
             
+            // Render projects section
+            ProjectsModule.render(profile.projects || []);
+
             // Load comments AFTER showing the profile (non-blocking)
             // This prevents comment loading errors from blocking the profile display
             setTimeout(async () => {
@@ -376,7 +497,7 @@ const VotingModule = {
             if (profile.image) {
                 imageElement.innerHTML = `<img src="${profile.image}" alt="${profile.username}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
             } else {
-                imageElement.innerHTML = profile.emoji || '👤';
+                imageElement.innerHTML = '';
             }
         }
         
@@ -548,7 +669,7 @@ createLeaderboardRow(profile, index) {
     
     const avatarHTML = profile.image 
         ? `<img src="${profile.image}" alt="${profile.username}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">` 
-        : profile.emoji || '👤';
+        : '';
     
     row.innerHTML = `
         <div class="rank">${index + 1}</div>
@@ -625,7 +746,7 @@ const ChampionsModule = {
         
         const avatarHTML = profile.image 
             ? `<img src="${profile.image}" alt="${profile.username}">` 
-            : profile.emoji || '👤';
+            : '';
         
         const tagline = period === 'Day' ? "Today's top performer" 
                       : period === 'Week' ? "This week's champion" 
@@ -680,41 +801,50 @@ const ProfilesModule = {
     },
     
 createProfileTile(profile, index) {
-    const avatarHTML = profile.image 
-        ? `<img src="${profile.image}" alt="${profile.username}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">` 
-        : profile.emoji || '👤';
-    
+    const avatarHTML = profile.image
+        ? `<img src="${profile.image}" alt="${profile.username}">`
+        : '';
+
+    const rankClass = index < 3 ? 'top-3' : '';
+    const winRate = profile.battleWins && profile.battleLosses ?
+        Math.round((profile.battleWins / (profile.battleWins + profile.battleLosses)) * 100) : 0;
+
+    // Format followers nicely
+    const formatNumber = (num) => {
+        if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+        if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+        return num?.toString() || '0';
+    };
+
     const profileTile = document.createElement('div');
     profileTile.className = 'profile-tile';
-    profileTile.style.cursor = 'pointer';
     profileTile.onclick = () => ProfileModule.showProfileDetail(profile.username);
-    
+
     profileTile.innerHTML = `
-        <div class="profile-rank">${index + 1}</div>
         <div class="profile-tile-header">
             <div class="profile-tile-avatar">${avatarHTML}</div>
             <div class="profile-tile-info">
                 <div class="profile-tile-name">${profile.username}</div>
                 <div class="profile-tile-handle">${profile.handle}</div>
             </div>
+            <div class="profile-rank ${rankClass}">#${index + 1}</div>
         </div>
         <div class="profile-tile-stats">
             <div class="profile-tile-stat">
-                <div class="stat-title">Battle Votes</div>
-                <div class="stat-value">${profile.votes || 0}</div>
+                <div class="stat-value">${formatNumber(profile.votes || 0)}</div>
+                <div class="stat-title">Votes</div>
             </div>
             <div class="profile-tile-stat">
+                <div class="stat-value">${winRate}%</div>
                 <div class="stat-title">Win Rate</div>
-                <div class="stat-value">${profile.battleWins && profile.battleLosses ? 
-                    Math.round((profile.battleWins / (profile.battleWins + profile.battleLosses)) * 100) : 0}%</div>
+            </div>
+            <div class="profile-tile-stat">
+                <div class="stat-value">${formatNumber(profile.followers)}</div>
+                <div class="stat-title">Followers</div>
             </div>
         </div>
-        <div class="profile-tile-footer">
-            <div class="followers-count">Followers: ${profile.followers}</div>
-            <div class="score-badge">Score: ${profile.score}</div>
-        </div>
     `;
-    
+
     return profileTile;
 }
 };
@@ -791,7 +921,7 @@ const KOLModule = {
             <div class="kol-rank">${kol.rank}</div>
             <div class="kol-profile">
                 <div class="kol-avatar">
-                    ${kol.avatar ? `<img src="${kol.avatar}" alt="${kol.name}">` : '👤'}
+                    ${kol.avatar ? `<img src="${kol.avatar}" alt="${kol.name}">` : ''}
                 </div>
                 <div class="kol-info">
                     <div class="kol-name">${kol.name}</div>
@@ -858,14 +988,91 @@ const SearchModule = {
 
 // ==================== DEBUG MODULE ====================
 const DebugModule = {
+    isDragging: false,
+    dragOffset: { x: 0, y: 0 },
+
+    init() {
+        const debugOverlay = document.getElementById('debug-overlay');
+        const debugHeader = debugOverlay?.querySelector('.debug-header');
+
+        if (!debugOverlay || !debugHeader) return;
+
+        // Mouse events
+        debugHeader.addEventListener('mousedown', (e) => this.startDrag(e));
+        document.addEventListener('mousemove', (e) => this.drag(e));
+        document.addEventListener('mouseup', () => this.stopDrag());
+
+        // Touch events for mobile
+        debugHeader.addEventListener('touchstart', (e) => this.startDrag(e));
+        document.addEventListener('touchmove', (e) => this.drag(e));
+        document.addEventListener('touchend', () => this.stopDrag());
+    },
+
+    startDrag(e) {
+        const debugOverlay = document.getElementById('debug-overlay');
+        if (!debugOverlay) return;
+
+        this.isDragging = true;
+        debugOverlay.classList.add('dragging');
+
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+        const rect = debugOverlay.getBoundingClientRect();
+        this.dragOffset.x = clientX - rect.left;
+        this.dragOffset.y = clientY - rect.top;
+
+        e.preventDefault();
+    },
+
+    drag(e) {
+        if (!this.isDragging) return;
+
+        const debugOverlay = document.getElementById('debug-overlay');
+        if (!debugOverlay) return;
+
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+        let newX = clientX - this.dragOffset.x;
+        let newY = clientY - this.dragOffset.y;
+
+        // Keep within viewport bounds
+        const maxX = window.innerWidth - debugOverlay.offsetWidth;
+        const maxY = window.innerHeight - debugOverlay.offsetHeight;
+
+        newX = Math.max(0, Math.min(newX, maxX));
+        newY = Math.max(0, Math.min(newY, maxY));
+
+        debugOverlay.style.left = newX + 'px';
+        debugOverlay.style.top = newY + 'px';
+        debugOverlay.style.right = 'auto';
+
+        e.preventDefault();
+    },
+
+    stopDrag() {
+        const debugOverlay = document.getElementById('debug-overlay');
+        if (debugOverlay) {
+            debugOverlay.classList.remove('dragging');
+        }
+        this.isDragging = false;
+    },
+
+    toggleMinimize() {
+        const debugOverlay = document.getElementById('debug-overlay');
+        if (!debugOverlay) return;
+        debugOverlay.classList.toggle('minimized');
+    },
+
     toggle() {
         const debugOverlay = document.getElementById('debug-overlay');
         if (!debugOverlay) return;
-        
+
         if (appState.debug.isVisible) {
             debugOverlay.style.display = 'none';
             appState.debug.isVisible = false;
-            
+
             if (appState.debug.updateInterval) {
                 clearInterval(appState.debug.updateInterval);
                 appState.debug.updateInterval = null;
@@ -874,7 +1081,7 @@ const DebugModule = {
             debugOverlay.style.display = 'block';
             appState.debug.isVisible = true;
             this.update();
-            
+
             appState.debug.updateInterval = setInterval(() => {
                 this.update();
             }, CONFIG.DEBUG_UPDATE_INTERVAL);
@@ -895,7 +1102,7 @@ const DebugModule = {
         if (leftProfile && rightProfile && debugBattle) {
             debugBattle.innerHTML = `
                 <span class="debug-username1">${leftProfile.textContent}</span>
-                <span class="debug-vs">🔫 ⚔️ vs</span>
+                <span class="debug-vs">vs</span>
                 <span class="debug-username2">${rightProfile.textContent}</span>
             `;
         }
@@ -967,6 +1174,291 @@ const SocialModule = {
         }
     }
 };
+
+// ==================== PROJECTS MODULE ====================
+const ProjectsModule = {
+    currentProjects: [],
+    filteredProjects: [],
+    currentFilter: 'all',
+    _boundHandler: null,
+
+    init() {
+        // Create the bound handler once
+        this._boundHandler = (e) => {
+            const tab = e.target.closest('.projects-tab');
+            if (!tab) return;
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            const filter = tab.dataset.filter;
+            if (filter && filter !== this.currentFilter) {
+                this.setFilter(filter);
+            }
+        };
+
+        this.setupTabListeners();
+    },
+
+    setupTabListeners() {
+        const tabsContainer = document.getElementById('projects-tabs');
+        if (tabsContainer && this._boundHandler) {
+            // Use a data attribute to track if listener is attached
+            if (!tabsContainer.dataset.listenerAttached) {
+                tabsContainer.addEventListener('click', this._boundHandler);
+                tabsContainer.dataset.listenerAttached = 'true';
+            }
+        }
+    },
+
+    render(projects) {
+        this.currentProjects = projects || [];
+        this.filteredProjects = [...this.currentProjects];
+        this.currentFilter = 'all';
+
+        // Ensure init has been called (creates the bound handler)
+        if (!this._boundHandler) {
+            this.init();
+        }
+
+        // Re-setup tab listeners every time we render (ensures they work after navigation)
+        this.setupTabListeners();
+
+        // Reset tab active state
+        const tabs = document.querySelectorAll('.projects-tab');
+        tabs.forEach(tab => {
+            tab.classList.toggle('active', tab.dataset.filter === 'all');
+        });
+
+        this.renderGrid();
+    },
+
+    setFilter(filter) {
+        this.currentFilter = filter;
+
+        // Update tab active states
+        const tabs = document.querySelectorAll('.projects-tab');
+        tabs.forEach(tab => {
+            tab.classList.toggle('active', tab.dataset.filter === filter);
+        });
+
+        // Filter projects
+        if (filter === 'all') {
+            this.filteredProjects = [...this.currentProjects];
+        } else {
+            this.filteredProjects = this.currentProjects.filter(p => p.type === filter);
+        }
+
+        this.renderGrid();
+    },
+
+    renderGrid() {
+        const grid = document.getElementById('projects-grid');
+        const countEl = document.getElementById('projects-count');
+        const section = document.getElementById('projects-section');
+        const tabsEl = document.getElementById('projects-tabs');
+
+        if (!grid || !section) return;
+
+        // Update count
+        const totalCount = this.currentProjects.length;
+        const filteredCount = this.filteredProjects.length;
+
+        if (countEl) {
+            if (this.currentFilter === 'all') {
+                countEl.textContent = `${totalCount} project${totalCount !== 1 ? 's' : ''}`;
+            } else {
+                countEl.textContent = `${filteredCount} of ${totalCount}`;
+            }
+        }
+
+        // Hide section if no projects at all
+        if (totalCount === 0) {
+            section.style.display = 'none';
+            return;
+        }
+
+        section.style.display = 'block';
+
+        // Show/hide tabs based on project variety
+        const hasBull = this.currentProjects.some(p => p.type === 'bull');
+        const hasPromo = this.currentProjects.some(p => p.type === 'promoted');
+        if (tabsEl) {
+            tabsEl.style.display = (hasBull && hasPromo) ? 'flex' : 'none';
+        }
+
+        // Render empty state or grid
+        if (filteredCount === 0) {
+            grid.innerHTML = `
+                <div class="projects-empty">
+                    <div class="projects-empty-icon">No projects found</div>
+                    <p>No ${this.currentFilter === 'bull' ? 'bull call' : 'promoted'} projects yet</p>
+                </div>
+            `;
+            return;
+        }
+
+        grid.innerHTML = this.filteredProjects.map((project, index) => {
+            const originalIndex = this.currentProjects.indexOf(project);
+            const resultClass = project.type === 'promoted' ? 'promo' : 'positive';
+            const resultText = project.result || (project.type === 'promoted' ? 'Promo' : '+');
+
+            return `
+                <div class="project-card" onclick="ProjectsModule.openLightbox(${originalIndex})">
+                    <div class="project-card-image-wrapper">
+                        <span class="project-result-badge ${resultClass}">${resultText}</span>
+                        <img class="project-image" src="${project.image}" alt="${project.name}" onerror="this.src='https://api.dicebear.com/7.x/shapes/svg?seed=${project.name}'">
+                    </div>
+                    <div class="project-info">
+                        <div class="project-info-header">
+                            <span class="project-name">${project.name}</span>
+                            <span class="project-ticker">${project.ticker || ''}</span>
+                        </div>
+                        <p class="project-description">${project.description || ''}</p>
+                        ${project.callType && project.callType !== 'legit' ? `
+                            <div class="call-type-badge ${project.callType}">
+                                ${this.getCallTypeIcon(project.callType)}
+                                ${this.getCallTypeLabel(project.callType)}
+                            </div>
+                        ` : ''}
+                        <div class="project-footer">
+                            <span class="project-date">${this.formatDate(project.date)}</span>
+                            <span class="project-type ${project.type}">${project.type === 'bull' ? 'Bull' : 'Promo'}</span>
+                        </div>
+                        ${project.dexScreenerUrl ? `
+                            <a href="${project.dexScreenerUrl}" class="project-dex-link" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                    <polyline points="15 3 21 3 21 9"></polyline>
+                                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                                </svg>
+                                DEX Screener
+                            </a>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    },
+
+    openLightbox(index) {
+        const project = this.currentProjects[index];
+        if (!project) return;
+
+        const lightbox = document.getElementById('project-lightbox');
+        const image = document.getElementById('lightbox-image');
+        const name = document.getElementById('lightbox-name');
+        const ticker = document.getElementById('lightbox-ticker');
+        const type = document.getElementById('lightbox-type');
+        const date = document.getElementById('lightbox-date');
+        const description = document.getElementById('lightbox-description');
+        const result = document.getElementById('lightbox-result');
+        const dexBtn = document.getElementById('lightbox-dex-btn');
+
+        if (lightbox && image && name && type && date) {
+            image.src = project.image;
+            image.alt = project.name;
+            image.onerror = function() {
+                this.src = `https://api.dicebear.com/7.x/shapes/svg?seed=${project.name}`;
+            };
+
+            name.textContent = project.name;
+
+            if (ticker) {
+                ticker.textContent = project.ticker || '';
+            }
+
+            type.textContent = project.type === 'bull' ? 'Bull Call' : 'Promoted';
+            type.className = `lightbox-type ${project.type}`;
+
+            date.textContent = this.formatDate(project.date);
+
+            if (description) {
+                description.textContent = project.description || '';
+            }
+
+            if (result) {
+                const resultClass = project.type === 'promoted' ? 'promo' : 'positive';
+                result.textContent = project.result || (project.type === 'promoted' ? 'Promo' : '+');
+                result.className = `lightbox-result-badge ${resultClass}`;
+            }
+
+            if (dexBtn) {
+                if (project.dexScreenerUrl) {
+                    dexBtn.href = project.dexScreenerUrl;
+                    dexBtn.style.display = 'flex';
+                } else {
+                    dexBtn.style.display = 'none';
+                }
+            }
+
+            // Handle call type badge
+            const callTypeEl = document.getElementById('lightbox-call-type');
+            if (callTypeEl) {
+                if (project.callType && project.callType !== 'legit') {
+                    callTypeEl.innerHTML = `${this.getCallTypeIcon(project.callType)} ${this.getCallTypeLabel(project.callType)}`;
+                    callTypeEl.className = `lightbox-call-type ${project.callType}`;
+                    callTypeEl.style.display = 'inline-flex';
+                } else {
+                    callTypeEl.style.display = 'none';
+                }
+            }
+
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+    },
+
+    closeLightbox() {
+        const lightbox = document.getElementById('project-lightbox');
+        if (lightbox) {
+            lightbox.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    },
+
+    formatDate(dateStr) {
+        if (!dateStr) return '';
+        const date = new Date(dateStr);
+        return date.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
+        });
+    },
+
+    getCallTypeLabel(callType) {
+        const labels = {
+            'bundled': 'Bundled & Dumped',
+            'early_dump': 'Early Buy & Dump',
+            'insider': 'Insider Info',
+            'legit': 'Legit Call'
+        };
+        return labels[callType] || '';
+    },
+
+    getCallTypeIcon(callType) {
+        const icons = {
+            'bundled': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg>',
+            'early_dump': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>',
+            'insider': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>',
+            'legit': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'
+        };
+        return icons[callType] || '';
+    }
+};
+
+// Initialize ProjectsModule when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    ProjectsModule.init();
+});
+
+// Close lightbox on Escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        ProjectsModule.closeLightbox();
+    }
+});
 
 // ==================== COMMENTS MODULE ====================
 const CommentsModule = {
@@ -1066,7 +1558,7 @@ const CommentsModule = {
         
         // Get author info
         const authorName = comment.authorId?.displayName || 'Anonymous';
-        const authorAvatar = comment.authorId?.avatar || '👤';
+        const authorAvatar = comment.authorId?.avatar || '';
 
         commentElement.innerHTML = `
             <div class="comment-avatar" style="background: linear-gradient(135deg, #ff0000, #cc0000);">
@@ -1610,18 +2102,25 @@ window.handleProfileVote = async function(voteType) {
         if (result.jeetVotes !== undefined) {
             jeetCount.textContent = formatVoteCount(result.jeetVotes);
         }
-        
+
         // Force update percentages based on new counts
         updateVotePercentages();
-        
+
+        // Update global stats in real-time
+        if (voteType === 'jeet') {
+            GlobalStatsModule.incrementJeetVotes();
+        } else {
+            GlobalStatsModule.incrementChadVotes();
+        }
+
         // Show success message
         if (window.walletManager) {
             window.walletManager.showNotification(
-                `🗳️ Voted ${voteType.toUpperCase()} for ${profileName}!`, 
+                `Voted ${voteType.toUpperCase()} for ${profileName}!`,
                 'success'
             );
         }
-        
+
     } catch (error) {
         console.error('Profile vote failed:', error);
         // Reset vote state on error
@@ -1629,7 +2128,7 @@ window.handleProfileVote = async function(voteType) {
         jeetBtn.classList.remove('voting', 'voted');
         chadBtn.style.opacity = '1';
         jeetBtn.style.opacity = '1';
-        
+
         if (window.walletManager) {
             window.walletManager.showNotification('Vote failed. Please try again.', 'error');
         }
@@ -1720,6 +2219,7 @@ document.addEventListener('keydown', function(e) {
 // ==================== INITIALIZATION ====================
 document.addEventListener('DOMContentLoaded', async () => {
     await InitializationModule.initializeApp();
+    DebugModule.init();
 });
 
 // Export modules for debugging
